@@ -1,0 +1,27 @@
+name: download, parse, analyze and publish pipeline
+
+on: [push]
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: install requirements
+        shell: bash
+        run: pip install -r requirements.txt
+      - name: download votings
+        shell: bash
+        run: python crawler/votings.py
+      - name: Upload data
+        uses: actions/upload-artifact@v1
+        with:
+          name: data
+          path: data
