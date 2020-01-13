@@ -17,11 +17,13 @@ jobs:
       - name: install requirements
         shell: bash
         run: pip install -r requirements.txt
-      - name: download votings
+      - name: crawl data
         shell: bash
-        run: python crawler/votings.py
-      - name: Upload data
-        uses: actions/upload-artifact@v1
-        with:
-          name: data
-          path: data
+        run: python src/crawler.py
+      # artifact upload fails due to bug in action
+      # https://github.com/actions/upload-artifact/issues/35
+      # - name: upload data
+      #   uses: actions/upload-artifact@v1
+      #   with:
+      #     name: data
+      #     path: data

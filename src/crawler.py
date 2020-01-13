@@ -1,6 +1,7 @@
 import itertools
 import shutil
 import hashlib
+import zipfile
 import re
 from datetime import date
 from typing import NamedTuple
@@ -13,16 +14,31 @@ import requests
 Domain = "https://www.bundestag.de"
 
 VotingsListUrl = "{domain}/ajax/filterlist/de/parlament/plenum/abstimmung/liste/462112-462112/h_60ffc88993d8146490048cae8be92856?limit={limit}&noFilterSet=true&offset={offset}"
-VotingsOverviewUrl = "{domain}/abstimmung"
 VotingsLimit = 30
+
+DelegatesReferenceDataUrl = f"{Domain}/resource/blob/472878/7d4d417dbb7f7bd44508b3dc5de08ae2/MdB-Stammdaten-data.zip"
+DelegatesReferenceDataFilename = "delegates_reference_data.zip"
 
 DataFolder = Path("data")
 VotingsFolder = DataFolder / "votings"
+DelegatesFolder = DataFolder / "delegates"
 
 
-class Topic(NamedTuple):
-    index: int
-    name: str
+def make_soup(url: str):
+    with requests.get(url) as req:
+        assert req.status_code == 200, req
+    return BeautifulSoup(req.text, 'html.parser')
+
+
+def download(url: str, destination: Path):
+    with requests.get(url, stream=True) as req:
+        with open(str(destination), mode="wb") as dest_file:
+            shutil.copyfileobj(req.raw, dest_file)
+
+    if req.status_code == 200:
+        print(f"downloaded {url} -> {destination.name}", flush=True)
+    else:
+        print(f"failed {url}")
 
 
 class VotingResultsFile(NamedTuple):
@@ -37,21 +53,8 @@ class VotingResultsFile(NamedTuple):
     def filename(self) -> str:
         return f"{self.voting_date}_{self.title}{self._file_type()}"
 
-    def download(self):
-        with requests.get(self.url, stream=True) as req:
-            with open(str(VotingsFolder / self.filename), mode="wb") as dest_file:
-                shutil.copyfileobj(req.raw, dest_file)
-
-        if req.status_code == 200:
-            print(f"downloaded {self.url} -> {self.filename}", flush=True)
-        else:
-            print(f"failed {self.url}")
-
-
-def make_soup(url: str):
-    with requests.get(url) as req:
-        assert req.status_code == 200, req
-    return BeautifulSoup(req.text, 'html.parser')
+    def download(self, votings_folder: Path):
+        download(self.url, votings_folder / self.filename)
 
 
 def votings():
@@ -102,14 +105,29 @@ def votings():
                     break
 
 
+def download_delegates_reference_data(url: str, destination: Path):
+    download(url, destination / DelegatesReferenceDataFilename)
+    with zipfile.ZipFile(destination / DelegatesReferenceDataFilename, mode="r") as zip:
+        open(destination / "schema.dtd",
+             mode="wb").write(zip.read("MDB_STAMMDATEN.DTD"))
+        open(destination / "data.xml",
+             mode="wb").write(zip.read("MDB_STAMMDATEN.XML"))
+
+
 def cleanup():
     if DataFolder.exists():
         shutil.rmtree(str(DataFolder))
     DataFolder.mkdir(exist_ok=True)
     VotingsFolder.mkdir(exist_ok=True)
+    DelegatesFolder.mkdir(exist_ok=True)
 
 
 if __name__ == "__main__":
     cleanup()
     with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(lambda v: v.download(), votings())
+        download_delegates_reference_data_task = executor.submit(
+            download_delegates_reference_data, DelegatesReferenceDataUrl,
+            DelegatesFolder
+        )
+        executor.map(lambda v: v.download(VotingsFolder), votings())
+        download_delegates_reference_data_task.result()
