@@ -20,6 +20,9 @@ jobs:
       - name: crawl data
         shell: bash
         run: python src/crawler.py
+      - name: parse data
+        shell: bash
+        run: python src/parser.py
       # artifact upload fails due to bug in action
       # https://github.com/actions/upload-artifact/issues/35
       # - name: upload data

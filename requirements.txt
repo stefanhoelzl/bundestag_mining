@@ -1,2 +1,4 @@
 beautifulsoup4==4.8.2
 requests==2.22.0
+peewee==3.13.1
+xlrd==1.2.0
