@@ -1,0 +1,29 @@
+
+Parteien
+=================
+
+Nach Geschlecht (in %)
+----------------------
+
+.. pygal::
+
+    import generator
+    plot = generator.import_file("/home/runner/work/bundestag_mining/bundestag_mining/src/analyses/parties.py").__dict__["by_gender"]()
+
+
+Nach Titel (in %)
+------------------
+
+.. pygal::
+
+    import generator
+    plot = generator.import_file("/home/runner/work/bundestag_mining/bundestag_mining/src/analyses/parties.py").__dict__["by_title"]()
+
+
+Nach Abstimmverhalten (in %)
+----------------------------
+
+.. pygal::
+
+    import generator
+    plot = generator.import_file("/home/runner/work/bundestag_mining/bundestag_mining/src/analyses/parties.py").__dict__["by_voting_habit"]()
