@@ -83,18 +83,6 @@ DelegateNameFixes = {
     "Ronja Schmitt (Althengstett)": "Ronja Schmitt",
 }
 
-NotYetListedDelegates = {
-    "Dr. Joe Weingarten": 19,
-    "Charlotte Schneidewind-Hartnagel": 19,
-    "Reginald Hanke": 19,
-    "Dr. Saskia Ludwig": 19,
-    "Sylvia Lehmann": 19,
-    "Sandra Bubendorfer-Licht": 19,
-    "Dr. Eberhard Brecht": 19,
-    "Markus Paschke": 19,
-    "Bernd Siebert": 19,
-}
-
 
 def parse_votings():
     def fix_delegate_name(name):
@@ -147,9 +135,8 @@ def parse_votings():
                     )
                 }
                 if len(distinct_delegate_ids) == 0:
-                    if (full_name, voting.term) in NotYetListedDelegates.items():
-                        continue
-                    raise Exception(f"delegate not found: '{full_name}'")
+                    print(f"delegate not found: '{full_name}'")
+                    continue
                 if len(distinct_delegate_ids) > 1:
                     raise Exception(f"ambigous delegate name: {full_name}")
 
