@@ -35,10 +35,13 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
           publish_dir: ./html
           allow_empty_commit: true
-      # artifact upload fails due to bug in action
-      # https://github.com/actions/upload-artifact/issues/35
-      # - name: upload data
-      #   uses: actions/upload-artifact@v1
-      #   with:
-      #     name: data
-      #     path: data
+      - name: package data for upload
+        shell: bash
+        run: mkdir upload && tar -czvf upload/data.tar.gz data && tar -czvf upload/html.tar.gz html && tar -czvf upload/rst.tar.gz rst
+        if: always()
+      - name: upload data
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: upload
+          path: upload
