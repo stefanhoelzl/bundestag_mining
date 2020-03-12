@@ -92,6 +92,7 @@ NotYetListedDelegates = {
     "Sandra Bubendorfer-Licht": 19,
     "Dr. Eberhard Brecht": 19,
     "Markus Paschke": 19,
+    "Bernd Siebert": 19,
 }
 
 
@@ -148,7 +149,7 @@ def parse_votings():
                 if len(distinct_delegate_ids) == 0:
                     if (full_name, voting.term) in NotYetListedDelegates.items():
                         continue
-                    raise Exception(f"delegate not found: {full_name}")
+                    raise Exception(f"delegate not found: '{full_name}'")
                 if len(distinct_delegate_ids) > 1:
                     raise Exception(f"ambigous delegate name: {full_name}")
 
