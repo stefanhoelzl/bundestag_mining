@@ -29,6 +29,12 @@ jobs:
       - name: generate html
         shell: bash
         run: python src/generator.py
+      - name: deploy html
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./html
+          allow_empty_commit: true
       # artifact upload fails due to bug in action
       # https://github.com/actions/upload-artifact/issues/35
       # - name: upload data
