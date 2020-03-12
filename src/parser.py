@@ -105,23 +105,17 @@ def parse_votings():
     def mapped(rows):
         headers_mapping = {
             "Bezeichnung": "full_name",
-            "Fraktion/Gruppe": "group",
-            "ja": "yes",
-            "nein": "no",
-            "Enthaltung": "abstention",
-            "ungültig": "invalid",
-            "nichtabgegeben": "missing",
+            "Fraktion/Gruppe": "group"
         }
         headers = [header.value for header in next(rows)]
         for row in rows:
             yield {
-                headers_mapping[header]: cell.value
+                headers_mapping.get(header, header): cell.value
                 for header, cell in zip(headers, row)
-                if header in headers_mapping
             }
 
     def get_choice(row):
-        for choice in ["yes", "no", "abstention", "invalid", "missing"]:
+        for choice in ["ja", "nein", "Enthaltung", "ungültig", "nichtabgegeben"]:
             if row.get(choice) == 1:
                 return choice
         raise Exception(f"invalid row: {row}")

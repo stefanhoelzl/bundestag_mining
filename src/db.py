@@ -1,7 +1,7 @@
 from pathlib import Path
 from enum import Enum
 from contextlib import contextmanager
-from peewee import SqliteDatabase, Model, ForeignKeyField, IntegerField, TextField, DateField, CompositeKey
+from peewee import SqliteDatabase, Model, ForeignKeyField, IntegerField, TextField, DateField, CompositeKey, fn
 
 Db = Path("data/bundestag.sqlite")
 

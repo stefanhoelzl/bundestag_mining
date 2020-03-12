@@ -26,6 +26,9 @@ jobs:
       - name: parse data
         shell: bash
         run: python src/parser.py
+      - name: generate html
+        shell: bash
+        run: python src/generator.py
       # artifact upload fails due to bug in action
       # https://github.com/actions/upload-artifact/issues/35
       # - name: upload data
